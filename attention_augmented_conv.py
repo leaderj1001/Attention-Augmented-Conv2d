@@ -2,6 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+use_cuda = torch.cuda.is_available()
+device = torch.device("cuda" if use_cuda else "cpu")
+
 
 class AugmentedConv(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, dk, dv, Nh, relative):
@@ -83,10 +86,10 @@ class AugmentedConv(nn.Module):
         B, Nh, dk, H, W = q.size()
         q = torch.transpose(q, 2, 4)
 
-        key_rel_w = nn.Parameter(torch.randn((2 * W - 1, dk), requires_grad=True))
+        key_rel_w = nn.Parameter(torch.randn((2 * W - 1, dk), requires_grad=True)).to(device)
         rel_logits_w = self.relative_logits_1d(q, key_rel_w, H, W, Nh, "w")
 
-        key_rel_h = nn.Parameter(torch.randn((2 * H - 1, dk), requires_grad=True))
+        key_rel_h = nn.Parameter(torch.randn((2 * H - 1, dk), requires_grad=True)).to(device)
         rel_logits_h = self.relative_logits_1d(torch.transpose(q, 2, 3), key_rel_h, W, H, Nh, "h")
 
         return rel_logits_h, rel_logits_w
@@ -108,13 +111,13 @@ class AugmentedConv(nn.Module):
         return rel_logits
 
     def rel_to_abs(self, x):
-        B, Nh, L, _ = x.shape
+        B, Nh, L, _ = x.size()
 
-        col_pad = torch.zeros((B, Nh, L, 1))
+        col_pad = torch.zeros((B, Nh, L, 1)).to(device)
         x = torch.cat((x, col_pad), dim=3)
 
         flat_x = torch.reshape(x, (B, Nh, L * 2 * L))
-        flat_pad = torch.zeros((B, Nh, L - 1))
+        flat_pad = torch.zeros((B, Nh, L - 1)).to(device)
         flat_x_padded = torch.cat((flat_x, flat_pad), dim=2)
 
         final_x = torch.reshape(flat_x_padded, (B, Nh, L + 1, 2 * L - 1))
