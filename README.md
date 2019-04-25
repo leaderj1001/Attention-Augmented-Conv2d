@@ -1,4 +1,7 @@
-# Implementing Attention Augmented Convolutional Networks using pytorch
+# Implementing Attention Augmented Convolutional Networks using Pytorch
+- In the paper, it is implemented as Tensorflow. So I implemented it with Pytorch.
+
+# Reference
 - [Attention Augmented Convolutional Networks Paper](https://arxiv.org/abs/1904.09925)
 - Author, Irwan Bello, Barret Zoph, Ashish Vaswani, Jonathon Shlens
 - Quoc V.Le Google Brain
