@@ -30,5 +30,8 @@ CIFAR-100 | Just 3-Attention-Augmented Conv layers(channels: 64, 128, 192) | 59.
 - The above results show that there are many time differences. I will think about this part a bit more.
   - I have seen the issue that the torch.einsum function is slow. [Link](https://github.com/pytorch/pytorch/issues/10661)
   - When I execute the example code in the link, the result was:<br><br>
- ![캡처](https://user-images.githubusercontent.com/22078438/56733452-2cc1c900-679b-11e9-861c-9aedfcedacac.PNG)
+  ![캡처](https://user-images.githubusercontent.com/22078438/56733452-2cc1c900-679b-11e9-861c-9aedfcedacac.PNG)
+   - using cuda<br><Br>
+   ![캡처](https://user-images.githubusercontent.com/22078438/56735393-4dd8e880-67a0-11e9-9fd0-6c0a4161d29d.PNG)
+
 
