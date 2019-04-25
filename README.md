@@ -23,4 +23,7 @@
 | Datasets | Model | Accuracy | Epoch | Training Time |
 | :---: | :---: | :---: | :---: | :---: |
 CIFAR-10 | WORK IN PROCESS | | |
-CIFAR-100 | WORK IN PROCESS | | | 
+CIFAR-100 | Just 3-Conv layers(channels: 64, 128, 192) | 61.6% | 100 | 22m
+CIFAR-100 | Just 3-Attention-Augmented Conv layers(channels: 64, 128, 192) | 54.23% | 23 | 1h 35m
+
+- I just want to see feasibility of this method(Attention-Augemnted Conv layer), I'll try about ResNet.
