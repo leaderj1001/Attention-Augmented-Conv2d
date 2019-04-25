@@ -27,3 +27,8 @@ CIFAR-100 | Just 3-Conv layers(channels: 64, 128, 192) | 61.6% | 100 | 22m
 CIFAR-100 | Just 3-Attention-Augmented Conv layers(channels: 64, 128, 192) | 59.82% | 35 | 2h 23m
 
 - I just want to see feasibility of this method(Attention-Augemnted Conv layer), I'll try about ResNet.
+- The above results show that there are many time differences. I will think about this part a bit more.
+  - I have seen the issue that the torch.einsum function is slow. [Link](https://github.com/pytorch/pytorch/issues/10661)
+  - When I execute the example code in the link, the result was:<br><br>
+ ![캡처](https://user-images.githubusercontent.com/22078438/56733452-2cc1c900-679b-11e9-861c-9aedfcedacac.PNG)
+
