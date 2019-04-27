@@ -85,7 +85,7 @@ class AugmentedConv(nn.Module):
 
     def relative_logits(self, q):
         B, Nh, dk, H, W = q.size()
-        q = torch.transpose(q, 2, 4)
+        q = torch.transpose(q, 2, 4).transpose(2, 3)
 
         key_rel_w = nn.Parameter(torch.randn((2 * W - 1, dk), requires_grad=True)).to(device)
         rel_logits_w = self.relative_logits_1d(q, key_rel_w, H, W, Nh, "w")
@@ -96,7 +96,7 @@ class AugmentedConv(nn.Module):
         return rel_logits_h, rel_logits_w
 
     def relative_logits_1d(self, q, rel_k, H, W, Nh, case):
-        rel_logits = torch.einsum('bhxyd,md->bhmxy', q, rel_k)
+        rel_logits = torch.einsum('bhxyd,md->bhxym', q, rel_k)
         rel_logits = torch.reshape(rel_logits, (-1, Nh * H, W, 2 * W - 1))
         rel_logits = self.rel_to_abs(rel_logits)
 
