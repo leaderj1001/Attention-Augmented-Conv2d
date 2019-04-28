@@ -41,5 +41,10 @@ CIFAR-100 | Just 3-Attention-Augmented Conv layers(channels: 64, 128, 192) | 59.
   ![캡처](https://user-images.githubusercontent.com/22078438/56733452-2cc1c900-679b-11e9-861c-9aedfcedacac.PNG)
    - using cuda<br><Br>
    ![캡처](https://user-images.githubusercontent.com/22078438/56735393-4dd8e880-67a0-11e9-9fd0-6c0a4161d29d.PNG)
+  
+## Requirements
+- tqdm==4.31.1
+- torch==1.0.1
+- torchvision==0.2.2
 
 
