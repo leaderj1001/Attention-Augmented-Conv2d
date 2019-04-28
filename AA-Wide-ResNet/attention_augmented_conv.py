@@ -104,9 +104,9 @@ class AugmentedConv(nn.Module):
         rel_logits = torch.unsqueeze(rel_logits, dim=3)
         rel_logits = rel_logits.repeat((1, 1, 1, H, 1, 1))
 
-        if case is "w":
+        if case == "w":
             rel_logits = torch.transpose(rel_logits, 3, 4)
-        elif case is "h":
+        elif case == "h":
             rel_logits = torch.transpose(rel_logits, 2, 4).transpose(4, 5).transpose(3, 5)
         rel_logits = torch.reshape(rel_logits, (-1, Nh, H * W, H * W))
         return rel_logits
