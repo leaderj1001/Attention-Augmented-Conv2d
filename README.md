@@ -1,10 +1,18 @@
 # Implementing Attention Augmented Convolutional Networks using Pytorch
 - In the paper, it is implemented as Tensorflow. So I implemented it with Pytorch.
 
+## I posted two versions of the "Attention-Augmented Conv"
+  - Paper version is [here](https://github.com/leaderj1001/Attention-Augmented-Conv2d/blob/master/attention_augmented_conv.py)
+  - AA-Wide-ResNet version is [here](https://github.com/leaderj1001/Attention-Augmented-Conv2d/blob/master/AA-Wide-ResNet/attention_augmented_conv.py)
+
 # Reference
+## Paper
 - [Attention Augmented Convolutional Networks Paper](https://arxiv.org/abs/1904.09925)
 - Author, Irwan Bello, Barret Zoph, Ashish Vaswani, Jonathon Shlens
 - Quoc V.Le Google Brain
+## Wide-ResNet
+- [Github URL](https://github.com/meliketoy/wide-resnet.pytorch/blob/master/main.py)
+- Thank you :)
 
 ## Method
 ![image](https://user-images.githubusercontent.com/22078438/56668731-ffb5dd80-66ea-11e9-9274-1223f579f039.PNG)
