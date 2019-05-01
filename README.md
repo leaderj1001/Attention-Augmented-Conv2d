@@ -30,10 +30,12 @@
 ## Experiments
 | Datasets | Model | Accuracy | Epoch | Training Time |
 | :---: | :---: | :---: | :---: | :---: |
-CIFAR-10 | WORK IN PROCESS | | |
+CIFAR-10 | Wide-ResNet 28x10(WORK IN PROCESS) | | |
+CIFAR-100 | Wide-ResNet 28x10(WORK IN PROCESS) | | |
 CIFAR-100 | Just 3-Conv layers(channels: 64, 128, 192) | 61.6% | 100 | 22m
 CIFAR-100 | Just 3-Attention-Augmented Conv layers(channels: 64, 128, 192) | 59.82% | 35 | 2h 23m
 
+- I don't have enough GPUs. So, I have many difficulties in training. Sorry... T.T
 - I just want to see feasibility of this method(Attention-Augemnted Conv layer), I'll try about ResNet.
 - The above results show that there are many time differences. I will think about this part a bit more.
   - I have seen the issue that the torch.einsum function is slow. [Link](https://github.com/pytorch/pytorch/issues/10661)
