@@ -12,14 +12,17 @@ import time
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
 
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 
 def get_args():
     parser = argparse.ArgumentParser("parameters")
 
     parser.add_argument("--dataset-mode", type=str, default="CIFAR100", help="(example: CIFAR10, CIFAR100, MNIST), (default: CIFAR100)")
     parser.add_argument("--epochs", type=int, default=100, help="number of epochs, (default: 100)")
-    parser.add_argument("--batch-size", type=int, default=8, help="number of batch size, (default, 8)")
-    parser.add_argument("--learning-rate", type=float, default=1e-3, help="learning_rate, (default: 1e-1)")
+    parser.add_argument("--batch-size", type=int, default=15, help="number of batch size, (default, 15)")
+    parser.add_argument("--learning-rate", type=float, default=1e-3, help="learning_rate, (default: 1e-3)")
     parser.add_argument("--depth", type=int, default=28, help="wide-ResNet depth, (default: 28)")
     parser.add_argument("--widen_factor", type=int, default=10, help="wide_ResNet widen factor, (default: 10)")
     parser.add_argument("--dropout", type=float, default=0.3, help="dropout rate, (default: 0.3)")
@@ -56,7 +59,7 @@ def train(model, train_loader, optimizer, criterion, epoch, args):
         acc = float(y_pred.eq(target.data).sum()) / len(data) * 100.
         train_acc += acc
         step += 1
-        if step % 100 == 0:
+        if step % 1000 == 0:
             print("[Epoch {0:4d}] Loss: {1:2.3f} Acc: {2:.3f}%".format(epoch, loss.data, acc), end='')
             for param_group in optimizer.param_groups:
                 print(",  Current learning rate is: {}".format(param_group['lr']))
@@ -83,25 +86,42 @@ def main():
     args = get_args()
     train_loader, test_loader = load_data(args)
 
-    if args.dataset_mode == "CIFAR10":
+    if args.dataset_mode is "CIFAR10":
         num_classes = 10
-    elif args.dataset_mode == "CIFAR100":
+    elif args.dataset_mode is "CIFAR100":
         num_classes = 100
-    elif args.dataset_mode == "MNIST":
+    elif args.dataset_mode is "MNIST":
         num_classes = 10
 
     model = Wide_ResNet(args.depth, args.widen_factor, args.dropout, num_classes=num_classes).to(device)
+    # if torch.cuda.device_count() > 1:
+    #     print(torch.cuda.device_count())
+    #     model = nn.DataParallel(model).to(device)
     optimizer = optim.SGD(model.parameters(), lr=args.learning_rate, weight_decay=5e-4, momentum=0.9)
     criterion = nn.CrossEntropyLoss().to(device)
 
     start_time = time.time()
-    max_acc = 0
+    max_test_acc = 0
     for epoch in range(1, args.epochs):
         train(model, train_loader, optimizer, criterion, epoch, args)
         test_acc = get_test(model, test_loader)
-        if max_acc < test_acc:
-            max_acc = test_acc
-        print("Test acc:", max_acc, "time: ", time.time() - start_time)
+        if max_test_acc < test_acc:
+            print('Saving..')
+            state = {
+                'model': model.state_dict(),
+                'acc': test_acc,
+                'epoch': epoch,
+            }
+            if not os.path.isdir('checkpoint'):
+                os.mkdir('checkpoint')
+            filename = "best_model_"
+            torch.save(state, './checkpoint/' + filename + 'ckpt.t7')
+            max_test_acc = test_acc
+
+        time_interval = time.time() - start_time
+        time_split = time.gmtime(time_interval)
+        print("Training time: ", time_interval, "Hour: ", time_split.tm_hour, "Minute: ", time_split.tm_min, "Second: ", time_split.tm_sec)
+        print("Test acc:", max_test_acc, "time: ", time.time() - start_time)
 
 
 if __name__ == "__main__":

@@ -24,15 +24,15 @@ class wide_basic(nn.Module):
     def __init__(self, in_planes, planes, dropout_rate, stride=1, v=0.2, k=2, Nh=4):
         super(wide_basic, self).__init__()
         self.bn1 = nn.BatchNorm2d(in_planes)
-        self.conv1 = AugmentedConv(in_planes, planes, kernel_size=3, dk=k * planes, dv=int(v * planes), Nh=Nh, relative=True)
+        self.conv1 = AugmentedConv(in_planes, planes, kernel_size=3, dk=k * planes, dv=int(v * planes), Nh=Nh, relative=True, padding=1)
         self.dropout = nn.Dropout(p=dropout_rate)
         self.bn2 = nn.BatchNorm2d(planes)
-        self.conv2 = AugmentedConv(planes, planes, kernel_size=3, dk=k * planes, dv=int(v * planes), Nh=Nh, stride=stride, relative=True)
+        self.conv2 = AugmentedConv(planes, planes, kernel_size=3, dk=k * planes, dv=int(v * planes), Nh=Nh, stride=stride, relative=True, padding=1)
 
         self.shortcut = nn.Sequential()
         if stride != 1 or in_planes != planes:
             self.shortcut = nn.Sequential(
-                AugmentedConv(in_planes, planes, kernel_size=3, dk=k * planes, dv=int(v * planes), Nh=Nh, relative=True, stride=stride),
+                AugmentedConv(in_planes, planes, kernel_size=3, dk=k * planes, dv=int(v * planes), Nh=Nh, relative=False, stride=stride, padding=1),
             )
 
     def forward(self, x):
@@ -60,7 +60,7 @@ class Wide_ResNet(nn.Module):
         print('| Wide-Resnet %dx%d' % (depth, k))
         n_Stages = [20, 20 * k, 40 * k, 40 * k]
 
-        self.conv1 = AugmentedConv(3, n_Stages[0], kernel_size=3, dk=dk_k * n_Stages[0], dv=int(dv_v * n_Stages[0]), Nh=Nh, relative=True)
+        self.conv1 = AugmentedConv(3, n_Stages[0], kernel_size=3, dk=dk_k * n_Stages[0], dv=int(dv_v * n_Stages[0]), Nh=Nh, relative=True, padding=1)
         self.layer1 = nn.Sequential(
             self._wide_layer(wide_basic, n_Stages[1], n, dropout_rate, stride=1),
         )
