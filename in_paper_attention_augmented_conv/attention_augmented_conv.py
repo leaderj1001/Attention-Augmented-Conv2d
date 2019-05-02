@@ -7,7 +7,7 @@ device = torch.device("cuda" if use_cuda else "cpu")
 
 
 class AugmentedConv(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size, dk, dv, Nh, relative=False, padding=0, stride=1):
+    def __init__(self, in_channels, out_channels, kernel_size, dk, dv, Nh, relative):
         super(AugmentedConv, self).__init__()
         self.in_channels = in_channels
         self.out_channels = out_channels
@@ -16,27 +16,21 @@ class AugmentedConv(nn.Module):
         self.dv = dv
         self.Nh = Nh
         self.relative = relative
-        self.padding = padding
 
-        assert self.Nh != 0, "integer division or modulo by zero, Nh >= 1"
-        assert self.dk % self.Nh == 0, "dk should be divided by Nh. (example: out_channels: 20, dk: 40, Nh: 4)"
-        assert self.dv % self.Nh == 0, "dv should be divided by Nh. (example: out_channels: 20, dv: 4, Nh: 4)"
+        self.conv_out = nn.Conv2d(self.in_channels, self.out_channels - self.dv, self.kernel_size, padding=1)
 
-        self.conv_out = nn.Conv2d(self.in_channels, self.out_channels - self.dv, self.kernel_size, stride=stride, padding=self.padding)
+        self.qkv_conv = nn.Conv2d(self.in_channels, 2 * self.dk + self.dv, kernel_size=1)
 
-        self.qkv_conv = nn.Conv2d(self.in_channels, 2 * self.dk + self.dv, kernel_size=self.kernel_size, stride=stride, padding=self.padding)
-
-        self.attn_out = nn.Conv2d(self.dv, self.dv, kernel_size=1, stride=1)
+        self.attn_out = nn.Conv2d(self.dv, self.dv, 1)
 
     def forward(self, x):
         # Input x
         # (batch_size, channels, height, width)
-        # batch, _, height, width = x.size()
+        batch, _, height, width = x.size()
 
         # conv_out
         # (batch_size, out_channels, height, width)
         conv_out = self.conv_out(x)
-        batch, _, height, width = conv_out.size()
 
         # flat_q, flat_k, flat_v
         # (batch_size, Nh, height * width, dvh or dkh)
@@ -63,8 +57,8 @@ class AugmentedConv(nn.Module):
         return torch.cat((conv_out, attn_out), dim=1)
 
     def compute_flat_qkv(self, x, dk, dv, Nh):
+        N, _, H, W = x.size()
         qkv = self.qkv_conv(x)
-        N, _, H, W = qkv.size()
         q, k, v = torch.split(qkv, [dk, dk, dv], dim=1)
         q = self.split_heads_2d(q, Nh)
         k = self.split_heads_2d(k, Nh)
@@ -129,21 +123,3 @@ class AugmentedConv(nn.Module):
         final_x = torch.reshape(flat_x_padded, (B, Nh, L + 1, 2 * L - 1))
         final_x = final_x[:, :, :L, L - 1:]
         return final_x
-
-
-# Example Code
-import time
-
-tmp = torch.randn((16, 3, 32, 32)).to(device)
-start_time = time.time()
-augmented_conv = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=1, relative=True, padding=0).to(device)
-conv_out = augmented_conv(tmp)
-print(conv_out.shape)
-
-print("\nif relative is True, ", time.time() - start_time)
-
-# start_time = time.time()
-# b = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=1, relative=False).to(device)
-# naive_out = b(tmp)
-# print(naive_out.shape)
-# print("if relative is False, ", time.time() - start_time)
