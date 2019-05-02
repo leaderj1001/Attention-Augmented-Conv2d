@@ -31,6 +31,20 @@ augmented_conv = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk
 conv_out = augmented_conv(tmp)
 print(conv_out.shape) # (16, 20, 32, 32), (batch_size, out_channels, height, width)
 ```
+- Example, stride=2, padding=1
+```python
+import torch
+from attention_augmented_conv import AugmentedConv
+
+use_cuda = torch.cuda.is_available()
+device = torch.deivce('cuda' if use_cuda else 'cpu)
+
+temp_input = torch.randn((16, 3, 32, 32)).to(device)
+augmented_conv = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=1, relative=True, padding=1, stride=2).to(device)
+conv_out = augmented_conv(tmp)
+print(conv_out.shape) # (16, 20, 16, 16), (batch_size, out_channels, height, width)
+```
+
 - I added an assert for parameters (dk, dv, Nh).
 ```python
 assert self.Nh != 0, "integer division or modulo by zero, Nh >= 1"
