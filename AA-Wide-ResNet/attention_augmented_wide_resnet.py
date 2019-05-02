@@ -32,7 +32,7 @@ class wide_basic(nn.Module):
         self.shortcut = nn.Sequential()
         if stride != 1 or in_planes != planes:
             self.shortcut = nn.Sequential(
-                AugmentedConv(in_planes, planes, kernel_size=3, dk=k * planes, dv=int(v * planes), Nh=Nh, relative=False, stride=stride, padding=1),
+                AugmentedConv(in_planes, planes, kernel_size=3, dk=k * planes, dv=int(v * planes), Nh=Nh, relative=True, stride=stride, padding=1),
             )
 
     def forward(self, x):
