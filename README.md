@@ -45,6 +45,12 @@ CIFAR-100 | Just 3-Attention-Augmented Conv layers(channels: 64, 128, 192) | 59.
   ![캡처](https://user-images.githubusercontent.com/22078438/56733452-2cc1c900-679b-11e9-861c-9aedfcedacac.PNG)
    - using cuda<br><Br>
    ![캡처](https://user-images.githubusercontent.com/22078438/56735393-4dd8e880-67a0-11e9-9fd0-6c0a4161d29d.PNG)
+ 
+## Time complexity
+- I compared the time complexity of "relative = True" and "relative = False".
+- I'll compare the performance of the two different values(relative=True, relative=False).
+- In addition, I will consider ways to reduce time complexity in "relative = True".<br>
+![time_complexity](https://user-images.githubusercontent.com/22078438/57056552-376de800-6cde-11e9-90fc-492c28d78907.PNG)
   
 ## Requirements
 - tqdm==4.31.1
