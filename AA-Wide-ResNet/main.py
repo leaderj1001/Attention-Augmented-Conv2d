@@ -19,7 +19,7 @@ def get_args():
     parser.add_argument("--dataset-mode", type=str, default="CIFAR100", help="(example: CIFAR10, CIFAR100, MNIST), (default: CIFAR100)")
     parser.add_argument("--epochs", type=int, default=100, help="number of epochs, (default: 100)")
     parser.add_argument("--batch-size", type=int, default=8, help="number of batch size, (default, 8)")
-    parser.add_argument("--learning-rate", type=float, default=1e-1, help="learning_rate, (default: 1e-1)")
+    parser.add_argument("--learning-rate", type=float, default=1e-3, help="learning_rate, (default: 1e-1)")
     parser.add_argument("--depth", type=int, default=28, help="wide-ResNet depth, (default: 28)")
     parser.add_argument("--widen_factor", type=int, default=10, help="wide_ResNet widen factor, (default: 10)")
     parser.add_argument("--dropout", type=float, default=0.3, help="dropout rate, (default: 0.3)")
