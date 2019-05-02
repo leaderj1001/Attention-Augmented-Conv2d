@@ -28,6 +28,8 @@
 
 
 ## Experiments
+- In the paper, they said that We augment the Wide-ResNet-28-10 by augmenting the first convolution of all residual blocks with relative attention using Nh=8 heads and κ=2, υ=0.2 and a minimum of 20 dimensions per head for the keys.
+
 | Datasets | Model | Accuracy | Epoch | Training Time |
 | :---: | :---: | :---: | :---: | :---: |
 CIFAR-10 | Wide-ResNet 28x10(WORK IN PROCESS) | | |
