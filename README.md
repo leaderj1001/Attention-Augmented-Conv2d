@@ -1,6 +1,44 @@
 # Implementing Attention Augmented Convolutional Networks using Pytorch
 - In the paper, it is implemented as Tensorflow. So I implemented it with Pytorch.
 
+## Update (2019.05.02)
+- I have added padding to the "AugmentedConv" part.
+- You can use it as you would with nn.conv2d.
+- I will attach the example below as well.
+- Example, padding=0
+```python
+import torch
+from attention_augmented_conv import AugmentedConv
+
+use_cuda = torch.cuda.is_available()
+device = torch.deivce('cuda' if use_cuda else 'cpu)
+
+temp_input = torch.randn((16, 3, 32, 32)).to(device)
+augmented_conv = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=1, relative=True, padding=0).to(device)
+conv_out = augmented_conv(tmp)
+print(conv_out.shape) # (16, 20, 30, 30), (batch_size, out_channels, height, width)
+```
+- Example, padding=1
+```python
+import torch
+from attention_augmented_conv import AugmentedConv
+
+use_cuda = torch.cuda.is_available()
+device = torch.deivce('cuda' if use_cuda else 'cpu)
+
+temp_input = torch.randn((16, 3, 32, 32)).to(device)
+augmented_conv = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=1, relative=True, padding=1).to(device)
+conv_out = augmented_conv(tmp)
+print(conv_out.shape) # (16, 20, 32, 32), (batch_size, out_channels, height, width)
+```
+- I added an assert for parameters (dk, dv, Nh).
+```python
+assert self.Nh != 0, "integer division or modulo by zero, Nh >= 1"
+assert self.dk % self.Nh == 0, "dk should be divided by Nh. (example: out_channels: 20, dk: 40, Nh: 4)"
+assert self.dv % self.Nh == 0, "dv should be divided by Nh. (example: out_channels: 20, dv: 4, Nh: 4)"
+```
+
+
 ## I posted two versions of the "Attention-Augmented Conv"
   - Paper version is [here](https://github.com/leaderj1001/Attention-Augmented-Conv2d/blob/master/attention_augmented_conv.py)
   - AA-Wide-ResNet version is [here](https://github.com/leaderj1001/Attention-Augmented-Conv2d/blob/master/AA-Wide-ResNet/attention_augmented_conv.py)
@@ -28,12 +66,16 @@
 
 
 ## Experiments
+- In the paper, they said that We augment the Wide-ResNet-28-10 by augmenting the first convolution of all residual blocks with relative attention using Nh=8 heads and κ=2, υ=0.2 and a minimum of 20 dimensions per head for the keys.
+
 | Datasets | Model | Accuracy | Epoch | Training Time |
 | :---: | :---: | :---: | :---: | :---: |
-CIFAR-10 | WORK IN PROCESS | | |
+CIFAR-10 | Wide-ResNet 28x10(WORK IN PROCESS) | | |
+CIFAR-100 | Wide-ResNet 28x10(WORK IN PROCESS) | | |
 CIFAR-100 | Just 3-Conv layers(channels: 64, 128, 192) | 61.6% | 100 | 22m
 CIFAR-100 | Just 3-Attention-Augmented Conv layers(channels: 64, 128, 192) | 59.82% | 35 | 2h 23m
 
+- I don't have enough GPUs. So, I have many difficulties in training. Sorry... T.T
 - I just want to see feasibility of this method(Attention-Augemnted Conv layer), I'll try about ResNet.
 - The above results show that there are many time differences. I will think about this part a bit more.
   - I have seen the issue that the torch.einsum function is slow. [Link](https://github.com/pytorch/pytorch/issues/10661)
@@ -41,6 +83,12 @@ CIFAR-100 | Just 3-Attention-Augmented Conv layers(channels: 64, 128, 192) | 59.
   ![캡처](https://user-images.githubusercontent.com/22078438/56733452-2cc1c900-679b-11e9-861c-9aedfcedacac.PNG)
    - using cuda<br><Br>
    ![캡처](https://user-images.githubusercontent.com/22078438/56735393-4dd8e880-67a0-11e9-9fd0-6c0a4161d29d.PNG)
+ 
+## Time complexity
+- I compared the time complexity of "relative = True" and "relative = False".
+- I'll compare the performance of the two different values(relative=True, relative=False).
+- In addition, I will consider ways to reduce time complexity in "relative = True".<br>
+![time_complexity](https://user-images.githubusercontent.com/22078438/57056552-376de800-6cde-11e9-90fc-492c28d78907.PNG)
   
 ## Requirements
 - tqdm==4.31.1
