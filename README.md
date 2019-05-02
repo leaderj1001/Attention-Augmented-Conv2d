@@ -1,6 +1,44 @@
 # Implementing Attention Augmented Convolutional Networks using Pytorch
 - In the paper, it is implemented as Tensorflow. So I implemented it with Pytorch.
 
+## Update (2019.05.02)
+- I have added padding to the "AugmentedConv" part.
+- You can use it as you would with nn.conv2d.
+- I will attach the example below as well.
+- Example, padding=0
+```python
+import torch
+from attention_augmented_conv import AugmentedConv
+
+use_cuda = torch.cuda.is_available()
+device = torch.deivce('cuda' if use_cuda else 'cpu)
+
+temp_input = torch.randn((16, 3, 32, 32)).to(device)
+augmented_conv = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=1, relative=True, padding=0).to(device)
+conv_out = augmented_conv(tmp)
+print(conv_out.shape) # (16, 20, 30, 30), (batch_size, out_channels, height, width)
+```
+- Example, padding=1
+```python
+import torch
+from attention_augmented_conv import AugmentedConv
+
+use_cuda = torch.cuda.is_available()
+device = torch.deivce('cuda' if use_cuda else 'cpu)
+
+temp_input = torch.randn((16, 3, 32, 32)).to(device)
+augmented_conv = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=1, relative=True, padding=1).to(device)
+conv_out = augmented_conv(tmp)
+print(conv_out.shape) # (16, 20, 32, 32), (batch_size, out_channels, height, width)
+```
+- I added an assert for parameters (dk, dv, Nh).
+```python
+assert self.Nh != 0, "integer division or modulo by zero, Nh >= 1"
+assert self.dk % self.Nh == 0, "dk should be divided by Nh. (example: out_channels: 20, dk: 40, Nh: 4)"
+assert self.dv % self.Nh == 0, "dv should be divided by Nh. (example: out_channels: 20, dv: 4, Nh: 4)"
+```
+
+
 ## I posted two versions of the "Attention-Augmented Conv"
   - Paper version is [here](https://github.com/leaderj1001/Attention-Augmented-Conv2d/blob/master/attention_augmented_conv.py)
   - AA-Wide-ResNet version is [here](https://github.com/leaderj1001/Attention-Augmented-Conv2d/blob/master/AA-Wide-ResNet/attention_augmented_conv.py)
