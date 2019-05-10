@@ -9,7 +9,7 @@
 ```python
 import torch
 
-from relative_AA_conv import AugmentedConv
+from attention_augmented_conv import AugmentedConv
 
 use_cuda = torch.cuda.is_available()
 device = torch.deivce('cuda' if use_cuda else 'cpu')
@@ -28,7 +28,7 @@ for name, param in augmented_conv1.named_parameters():
 ```python
 import torch
 
-from relative_AA_conv import AugmentedConv
+from attention_augmented_conv import AugmentedConv
 
 use_cuda = torch.cuda.is_available()
 device = torch.deivce('cuda' if use_cuda else 'cpu')
@@ -47,7 +47,8 @@ print(conv_out1.shape) # (16, 20, 16, 16)
 - Example, relative=False, padding=0
 ```python
 import torch
-from relative_AA_conv import AugmentedConv
+
+from attention_augmented_conv import AugmentedConv
 
 use_cuda = torch.cuda.is_available()
 device = torch.deivce('cuda' if use_cuda else 'cpu')
@@ -60,7 +61,8 @@ print(conv_out.shape) # (16, 20, 30, 30), (batch_size, out_channels, height, wid
 - Example, relative=False, padding=1
 ```python
 import torch
-from relative_AA_conv import AugmentedConv
+
+from attention_augmented_conv import AugmentedConv
 
 use_cuda = torch.cuda.is_available()
 device = torch.deivce('cuda' if use_cuda else 'cpu')
@@ -73,7 +75,8 @@ print(conv_out.shape) # (16, 20, 32, 32), (batch_size, out_channels, height, wid
 - Example, relative=True, stride=2, padding=1
 ```python
 import torch
-from relative_AA_conv import AugmentedConv
+
+from attention_augmented_conv import AugmentedConv
 
 use_cuda = torch.cuda.is_available()
 device = torch.deivce('cuda' if use_cuda else 'cpu')
