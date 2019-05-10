@@ -7,7 +7,7 @@ device = torch.device("cuda" if use_cuda else "cpu")
 
 
 class AugmentedConv(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size, dk, dv, Nh, shape, relative=False, padding=0, stride=1):
+    def __init__(self, in_channels, out_channels, kernel_size, dk, dv, Nh, shape=0, relative=False, padding=0, stride=1):
         super(AugmentedConv, self).__init__()
         self.in_channels = in_channels
         self.out_channels = out_channels
@@ -31,8 +31,9 @@ class AugmentedConv(nn.Module):
 
         self.attn_out = nn.Conv2d(self.dv, self.dv, kernel_size=1, stride=1)
 
-        self.key_rel_w = nn.Parameter(torch.randn((2 * self.shape - 1, dk // Nh), requires_grad=True))
-        self.key_rel_h = nn.Parameter(torch.randn((2 * self.shape - 1, dk // Nh), requires_grad=True))
+        if self.relative:
+            self.key_rel_w = nn.Parameter(torch.randn((2 * self.shape - 1, dk // Nh), requires_grad=True))
+            self.key_rel_h = nn.Parameter(torch.randn((2 * self.shape - 1, dk // Nh), requires_grad=True))
 
     def forward(self, x):
         # Input x
@@ -138,10 +139,10 @@ tmp = torch.randn((16, 3, 32, 32)).to(device)
 augmented_conv1 = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=4, relative=True, padding=1, stride=2, shape=16).to(device)
 conv_out1 = augmented_conv1(tmp)
 print(conv_out1.shape)
-
-for name, param in augmented_conv1.named_parameters():
-    print('parameter name: ', name)
-
-augmented_conv2 = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=4, relative=True, padding=1, stride=1, shape=32).to(device)
-conv_out2 = augmented_conv2(tmp)
-print(conv_out2.shape)
+#
+# for name, param in augmented_conv1.named_parameters():
+#     print('parameter name: ', name)
+#
+# augmented_conv2 = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=4, relative=True, padding=1, stride=1, shape=32).to(device)
+# conv_out2 = augmented_conv2(tmp)
+# print(conv_out2.shape)
