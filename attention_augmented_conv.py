@@ -135,14 +135,14 @@ class AugmentedConv(nn.Module):
 
 
 # Example Code
-tmp = torch.randn((16, 3, 32, 32)).to(device)
-augmented_conv1 = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=4, relative=True, padding=1, stride=2, shape=16).to(device)
-conv_out1 = augmented_conv1(tmp)
-print(conv_out1.shape)
-#
+# tmp = torch.randn((16, 3, 32, 32)).to(device)
+# augmented_conv1 = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=4, relative=True, padding=1, stride=2, shape=16).to(device)
+# conv_out1 = augmented_conv1(tmp)
+# print(conv_out1.shape)
+
 # for name, param in augmented_conv1.named_parameters():
 #     print('parameter name: ', name)
-#
+
 # augmented_conv2 = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=4, relative=True, padding=1, stride=1, shape=32).to(device)
 # conv_out2 = augmented_conv2(tmp)
 # print(conv_out2.shape)
