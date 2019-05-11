@@ -7,7 +7,7 @@ device = torch.device("cuda" if use_cuda else "cpu")
 
 
 class AugmentedConv(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size, dk, dv, Nh, shape=0, relative=False, padding=0, stride=1):
+    def __init__(self, in_channels, out_channels, kernel_size, dk, dv, Nh, shape=0, relative=False, stride=1):
         super(AugmentedConv, self).__init__()
         self.in_channels = in_channels
         self.out_channels = out_channels
@@ -17,8 +17,8 @@ class AugmentedConv(nn.Module):
         self.Nh = Nh
         self.shape = shape
         self.relative = relative
-        self.padding = padding
         self.stride = stride
+        self.padding = (self.kernel_size - 1) // 2
 
         assert self.Nh != 0, "integer division or modulo by zero, Nh >= 1"
         assert self.dk % self.Nh == 0, "dk should be divided by Nh. (example: out_channels: 20, dk: 40, Nh: 4)"
@@ -139,10 +139,10 @@ class AugmentedConv(nn.Module):
 # augmented_conv1 = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=4, relative=True, padding=1, stride=2, shape=16).to(device)
 # conv_out1 = augmented_conv1(tmp)
 # print(conv_out1.shape)
-
+#
 # for name, param in augmented_conv1.named_parameters():
 #     print('parameter name: ', name)
-
+#
 # augmented_conv2 = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=4, relative=True, padding=1, stride=1, shape=32).to(device)
 # conv_out2 = augmented_conv2(tmp)
 # print(conv_out2.shape)
