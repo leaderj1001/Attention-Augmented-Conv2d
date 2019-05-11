@@ -7,7 +7,7 @@ device = torch.device("cuda" if use_cuda else "cpu")
 
 
 class AugmentedConv(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size, dk, dv, Nh, relative, padding=0, stride=1):
+    def __init__(self, in_channels, out_channels, kernel_size, dk, dv, Nh, shape=0, relative=False, stride=1):
         super(AugmentedConv, self).__init__()
         self.in_channels = in_channels
         self.out_channels = out_channels
@@ -15,18 +15,25 @@ class AugmentedConv(nn.Module):
         self.dk = dk
         self.dv = dv
         self.Nh = Nh
+        self.shape = shape
         self.relative = relative
-        self.padding = padding
+        self.stride = stride
+        self.padding = (self.kernel_size - 1) // 2
 
         assert self.Nh != 0, "integer division or modulo by zero, Nh >= 1"
         assert self.dk % self.Nh == 0, "dk should be divided by Nh. (example: out_channels: 20, dk: 40, Nh: 4)"
         assert self.dv % self.Nh == 0, "dv should be divided by Nh. (example: out_channels: 20, dv: 4, Nh: 4)"
+        assert stride in [1, 2], str(stride) + " Up to 2 strides are allowed."
 
         self.conv_out = nn.Conv2d(self.in_channels, self.out_channels - self.dv, self.kernel_size, stride=stride, padding=self.padding)
 
         self.qkv_conv = nn.Conv2d(self.in_channels, 2 * self.dk + self.dv, kernel_size=self.kernel_size, stride=stride, padding=self.padding)
 
         self.attn_out = nn.Conv2d(self.dv, self.dv, kernel_size=1, stride=1)
+
+        if self.relative:
+            self.key_rel_w = nn.Parameter(torch.randn((2 * self.shape - 1, dk // Nh), requires_grad=True))
+            self.key_rel_h = nn.Parameter(torch.randn((2 * self.shape - 1, dk // Nh), requires_grad=True))
 
     def forward(self, x):
         # Input x
@@ -45,7 +52,6 @@ class AugmentedConv(nn.Module):
         # (batch_size, Nh, height, width, dv or dk)
         flat_q, flat_k, flat_v, q, k, v = self.compute_flat_qkv(x, self.dk, self.dv, self.Nh)
         logits = torch.matmul(flat_q.transpose(2, 3), flat_k)
-
         if self.relative:
             h_rel_logits, w_rel_logits = self.relative_logits(q)
             logits += h_rel_logits
@@ -92,11 +98,8 @@ class AugmentedConv(nn.Module):
         B, Nh, dk, H, W = q.size()
         q = torch.transpose(q, 2, 4).transpose(2, 3)
 
-        key_rel_w = nn.Parameter(torch.randn((2 * W - 1, dk), requires_grad=True)).to(device)
-        rel_logits_w = self.relative_logits_1d(q, key_rel_w, H, W, Nh, "w")
-
-        key_rel_h = nn.Parameter(torch.randn((2 * H - 1, dk), requires_grad=True)).to(device)
-        rel_logits_h = self.relative_logits_1d(torch.transpose(q, 2, 3), key_rel_h, W, H, Nh, "h")
+        rel_logits_w = self.relative_logits_1d(q, self.key_rel_w, H, W, Nh, "w")
+        rel_logits_h = self.relative_logits_1d(torch.transpose(q, 2, 3), self.key_rel_h, W, H, Nh, "h")
 
         return rel_logits_h, rel_logits_w
 
@@ -119,11 +122,11 @@ class AugmentedConv(nn.Module):
     def rel_to_abs(self, x):
         B, Nh, L, _ = x.size()
 
-        col_pad = torch.zeros((B, Nh, L, 1)).to(device)
+        col_pad = torch.zeros((B, Nh, L, 1)).to(x)
         x = torch.cat((x, col_pad), dim=3)
 
         flat_x = torch.reshape(x, (B, Nh, L * 2 * L))
-        flat_pad = torch.zeros((B, Nh, L - 1)).to(device)
+        flat_pad = torch.zeros((B, Nh, L - 1)).to(x)
         flat_x_padded = torch.cat((flat_x, flat_pad), dim=2)
 
         final_x = torch.reshape(flat_x_padded, (B, Nh, L + 1, 2 * L - 1))
@@ -131,14 +134,15 @@ class AugmentedConv(nn.Module):
         return final_x
 
 
+# Example Code
 # tmp = torch.randn((16, 3, 32, 32)).to(device)
-# import time
-# start_time = time.time()
-# a = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=1, relative=True).to(device)
-# print(a(tmp).shape)
-# print(time.time() - start_time)
+# augmented_conv1 = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=4, relative=True, padding=1, stride=2, shape=16).to(device)
+# conv_out1 = augmented_conv1(tmp)
+# print(conv_out1.shape)
 #
-# start_time = time.time()
-# b = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=1, relative=False).to(device)
-# print(b(tmp).shape)
-# print(time.time() - start_time)
+# for name, param in augmented_conv1.named_parameters():
+#     print('parameter name: ', name)
+#
+# augmented_conv2 = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=4, relative=True, padding=1, stride=1, shape=32).to(device)
+# conv_out2 = augmented_conv2(tmp)
+# print(conv_out2.shape)
