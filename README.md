@@ -3,7 +3,7 @@
 
 ## Update (2019.05.11)
 - Fixed an issue where key_rel_w and key_rel_h were not found as learning parameters when using relative=True mode.
-- I have just modified attention-augmented-conv, and I will modify Wide-ResNet as soon as possible.<br><br>
+- **In "relative = True" mode, you can see that "key_rel_w" and "key_rel_h" are learning parameters. In "relative = False" mode, you do not have to worry about the "shape" parameter.**<br><br>
 
 - Example, relative=True, stride=1, shape=32
 ```python
