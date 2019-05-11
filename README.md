@@ -15,7 +15,7 @@ use_cuda = torch.cuda.is_available()
 device = torch.deivce('cuda' if use_cuda else 'cpu')
 
 tmp = torch.randn((16, 3, 32, 32)).to(device)
-augmented_conv1 = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=4, relative=True, padding=1, stride=1, shape=32).to(device)
+augmented_conv1 = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=4, relative=True, stride=1, shape=32).to(device)
 conv_out1 = augmented_conv1(tmp)
 print(conv_out1.shape) # (16, 20, 32, 32)
 
@@ -34,7 +34,7 @@ use_cuda = torch.cuda.is_available()
 device = torch.deivce('cuda' if use_cuda else 'cpu')
 
 tmp = torch.randn((16, 3, 32, 32)).to(device)
-augmented_conv1 = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=4, relative=True, padding=1, stride=2, shape=16).to(device)
+augmented_conv1 = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=4, relative=True, stride=2, shape=16).to(device)
 conv_out1 = augmented_conv1(tmp)
 print(conv_out1.shape) # (16, 20, 16, 16)
 ```
@@ -43,8 +43,9 @@ print(conv_out1.shape) # (16, 20, 16, 16)
 ## Update (2019.05.02)
 - I have added padding to the "AugmentedConv" part.
 - You can use it as you would with nn.conv2d.
-- I will attach the example below as well.
-- Example, relative=False, padding=0
+- I will attach the example below as well.<br><br>
+
+- Example, relative=False, stride=1
 ```python
 import torch
 
@@ -54,25 +55,11 @@ use_cuda = torch.cuda.is_available()
 device = torch.deivce('cuda' if use_cuda else 'cpu')
 
 temp_input = torch.randn((16, 3, 32, 32)).to(device)
-augmented_conv = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=1, relative=False, padding=0).to(device)
-conv_out = augmented_conv(tmp)
-print(conv_out.shape) # (16, 20, 30, 30), (batch_size, out_channels, height, width)
-```
-- Example, relative=False, padding=1
-```python
-import torch
-
-from attention_augmented_conv import AugmentedConv
-
-use_cuda = torch.cuda.is_available()
-device = torch.deivce('cuda' if use_cuda else 'cpu')
-
-temp_input = torch.randn((16, 3, 32, 32)).to(device)
-augmented_conv = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=1, relative=False, padding=1).to(device)
+augmented_conv = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=1, relative=False, stride=1).to(device)
 conv_out = augmented_conv(tmp)
 print(conv_out.shape) # (16, 20, 32, 32), (batch_size, out_channels, height, width)
 ```
-- Example, relative=True, stride=2, padding=1
+- Example, relative=False, stride=2
 ```python
 import torch
 
@@ -82,7 +69,7 @@ use_cuda = torch.cuda.is_available()
 device = torch.deivce('cuda' if use_cuda else 'cpu')
 
 temp_input = torch.randn((16, 3, 32, 32)).to(device)
-augmented_conv = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=1, relative=False, padding=1, stride=2).to(device)
+augmented_conv = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=1, relative=False, stride=2).to(device)
 conv_out = augmented_conv(tmp)
 print(conv_out.shape) # (16, 20, 16, 16), (batch_size, out_channels, height, width)
 ```
