@@ -12,7 +12,7 @@ import torch
 from attention_augmented_conv import AugmentedConv
 
 use_cuda = torch.cuda.is_available()
-device = torch.deivce('cuda' if use_cuda else 'cpu')
+device = torch.device('cuda' if use_cuda else 'cpu')
 
 tmp = torch.randn((16, 3, 32, 32)).to(device)
 augmented_conv1 = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=4, relative=True, stride=1, shape=32).to(device)
@@ -31,7 +31,7 @@ import torch
 from attention_augmented_conv import AugmentedConv
 
 use_cuda = torch.cuda.is_available()
-device = torch.deivce('cuda' if use_cuda else 'cpu')
+device = torch.device('cuda' if use_cuda else 'cpu')
 
 tmp = torch.randn((16, 3, 32, 32)).to(device)
 augmented_conv1 = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=4, relative=True, stride=2, shape=16).to(device)
@@ -52,7 +52,7 @@ import torch
 from attention_augmented_conv import AugmentedConv
 
 use_cuda = torch.cuda.is_available()
-device = torch.deivce('cuda' if use_cuda else 'cpu')
+device = torch.device('cuda' if use_cuda else 'cpu')
 
 temp_input = torch.randn((16, 3, 32, 32)).to(device)
 augmented_conv = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=1, relative=False, stride=1).to(device)
@@ -66,7 +66,7 @@ import torch
 from attention_augmented_conv import AugmentedConv
 
 use_cuda = torch.cuda.is_available()
-device = torch.deivce('cuda' if use_cuda else 'cpu')
+device = torch.device('cuda' if use_cuda else 'cpu')
 
 temp_input = torch.randn((16, 3, 32, 32)).to(device)
 augmented_conv = AugmentedConv(in_channels=3, out_channels=20, kernel_size=3, dk=40, dv=4, Nh=1, relative=False, stride=2).to(device)
